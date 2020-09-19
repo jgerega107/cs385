@@ -54,7 +54,7 @@ void PrimesSieve::display_primes() const {
 	cout << "Number of primes found: " << count_num_primes() << endl;
 	cout << "Primes up to " << limit_ << ":" << endl;
 
-	int totalPrimeCounter = 0;
+	int totalPrimeCounter = 1;
 	int linePrimeCounter = 0;
 	int confirmedPrimeCount = count_num_primes();
 	for (int i = 2; i <= limit_; i++) {
@@ -67,7 +67,7 @@ void PrimesSieve::display_primes() const {
 				}
 			} else {
 				if (linePrimeCounter < primes_per_row) {
-					if (totalPrimeCounter < confirmedPrimeCount) {
+					if (totalPrimeCounter < confirmedPrimeCount && linePrimeCounter+1 != primes_per_row) {
 						cout << setw(max_prime_width) << i << " ";
 					} else {
 						cout << setw(max_prime_width) << i;
