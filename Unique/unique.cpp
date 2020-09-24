@@ -29,9 +29,8 @@ bool all_unique_letters(const string &s) {
 	// and bitshifting operators.
 	// No credit will be given for other solutions.
 	unsigned int storage = 0;
-	unsigned int prevLetter;
 	for (char const &c : s) {
-		prevLetter = 1 << (c - s[0]);
+		unsigned int prevLetter = 1 << (c - s[0]);
 		if ((storage & prevLetter) != 0) {
 			return false;
 		}
