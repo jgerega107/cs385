@@ -139,7 +139,7 @@ int PrimesSieve::num_digits(int num) {
 	return digits;
 }
 
-int main() {
+int main(int argc, char * const argv[]) {
 	cout << "**************************** " << "Sieve of Eratosthenes"
 			<< " ****************************" << endl;
 	cout << "Search for primes up to: ";
