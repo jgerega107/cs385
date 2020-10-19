@@ -30,102 +30,154 @@ struct State {
 		return oss.str();
 	}
 
-	bool equals(State s) {
-		return (s.a == a && s.b == b && s.c == c);
+	bool equals(State *s) {
+		return (s->a == a && s->b == b && s->c == c);
 	}
 
 };
 
 //jug == 0 for a, 1 for b, 2 for c
-queue<State> pour(State p1, State *p1r) {
-	queue<State> newstates;
+queue<State*> pour(State *p1) {
+	queue<State*> newstates;
 	//c to a
-	if (p1.a != values[0]) {
-		State newjug = State(p1.a, p1.b, p1.c, "C to A");
-		newjug.a += p1.c;
-		newjug.c = 0;
-		int topoff = newjug.a - values[0];
+	if (p1->a != values[0]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->a += p1->c;
+		newjug->c = 0;
+		int topoff = newjug->a - values[0];
 		if (topoff > 0) {
-			newjug.a -= topoff;
-			newjug.c += topoff;
+			newjug->a -= topoff;
+			newjug->c += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->c - newjug->c;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallon from C to A.";
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from C to A.";
+		}
+
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
 	//b to a
-	if (p1.a != values[0]) {
-		State newjug = State(p1.a, p1.b, p1.c, "B to A");
-		newjug.a += p1.b;
-		newjug.b = 0;
-		int topoff = newjug.a - values[0];
+	if (p1->a != values[0]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->a += p1->b;
+		newjug->b = 0;
+		int topoff = newjug->a - values[0];
 		if (topoff > 0) {
-			newjug.a -= topoff;
-			newjug.b += topoff;
+			newjug->a -= topoff;
+			newjug->b += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->b - newjug->b;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallon from B to A.";
+
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from B to A.";
+		}
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
 	//c to b
-	if (p1.b != values[1]) {
-		State newjug = State(p1.a, p1.b, p1.c, "C to B");
-		newjug.b += p1.c;
-		newjug.c = 0;
-		int topoff = newjug.b - values[1];
+	if (p1->b != values[1]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->b += p1->c;
+		newjug->c = 0;
+		int topoff = newjug->b - values[1];
 		if (topoff > 0) {
-			newjug.b -= topoff;
-			newjug.c += topoff;
+			newjug->b -= topoff;
+			newjug->c += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->c - newjug->c;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallon from C to B.";
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from C to B.";
+		}
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
 	//a to b
-	if (p1.b != values[1]) {
-		State newjug = State(p1.a, p1.b, p1.c, "A to B");
-		newjug.b += p1.a;
-		newjug.a = 0;
-		int topoff = newjug.b - values[1];
+	if (p1->b != values[1]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->b += p1->a;
+		newjug->a = 0;
+		int topoff = newjug->b - values[1];
 		if (topoff > 0) {
-			newjug.b -= topoff;
-			newjug.a += topoff;
+			newjug->b -= topoff;
+			newjug->a += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->a - newjug->a;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallon from A to B.";
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from A to B.";
+		}
+
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
 	//b to c
-	if (p1.c != values[2]) {
-		State newjug = State(p1.a, p1.b, p1.c, "B to C");
-		newjug.c += p1.b;
-		newjug.b = 0;
-		int topoff = newjug.c - values[2];
+	if (p1->c != values[2]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->c += p1->b;
+		newjug->b = 0;
+		int topoff = newjug->c - values[2];
 		if (topoff > 0) {
-			newjug.c -= topoff;
-			newjug.b += topoff;
+			newjug->c -= topoff;
+			newjug->b += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->b - newjug->b;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from B to C.";
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from B to C.";
+		}
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
 	//a to c
-	if (p1.c != values[2]) {
-		State newjug = State(p1.a, p1.b, p1.c, "A to C");
-		newjug.c += p1.a;
-		newjug.a = 0;
-		int topoff = newjug.c - values[2];
+	if (p1->c != values[2]) {
+		State *newjug = new State(p1->a, p1->b, p1->c, "");
+		newjug->c += p1->a;
+		newjug->a = 0;
+		int topoff = newjug->c - values[2];
 		if (topoff > 0) {
-			newjug.c -= topoff;
-			newjug.a += topoff;
+			newjug->c -= topoff;
+			newjug->a += topoff;
 		}
-		newjug.parent = p1r;
-		if (!newjug.equals(p1)) {
+		newjug->parent = p1;
+		int amount = p1->a - newjug->a;
+		if (amount == 1) {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallon from A to C.";
+		} else {
+			newjug->directions = "Pour " + to_string(amount)
+					+ " gallons from A to C.";
+		}
+
+		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
 	}
@@ -133,30 +185,59 @@ queue<State> pour(State p1, State *p1r) {
 }
 
 string bfs(int a, int b, int c) {
-	queue<State> Q;
-	State is = State(a, b, c, "Initial state");
-	State gs = State(values[3], values[4], values[5], "Goal state");
+	queue<State*> Q;
+	State *is = new State(a, b, c, "Initial state.");
+	State *gs = new State(values[3], values[4], values[5], "Goal state.");
+	int rows = values[0] + 1;
+	int cols = values[1] + 1;
+	bool **array = new bool*[rows];
+	for (int i = 0; i < rows; ++i) {
+		array[i] = new bool[cols];
+		fill(array[i], array[i] + cols, false);
+	}
 	Q.push(is);
 	while (!Q.empty()) {
-		State current = Q.front();
+		State *current = Q.front();
 		Q.pop();
-		if (current.equals(gs)) {
-			return "";
+		if (current->equals(gs)) {
+			string solution = "";
+			vector < string > path;
+			while (current->parent != nullptr) {
+				string cpath = current->directions + " " + current->to_string();
+				path.push_back(cpath);
+				current = current->parent;
+			}
+			string ipath = is->directions + " " + is->to_string();
+			path.push_back(ipath);
+			auto it = path.rbegin();
+			while (it != path.rend() - 1) {
+				solution += *it + "\n";
+				++it;
+			}
+			solution += *it;
+			delete is;
+			delete gs;
+			for (int i = 0; i < rows; ++i) {
+				delete[] array[i];
+			}
+			delete[] array;
+			while(!Q.empty()){
+				delete Q.front();
+				Q.pop();
+			}
+			return solution;
 		}
 		//try to pour and add each possible state to queue
-		queue<State> newpours = pour(current, &current);
-		while (!newpours.empty()) {
-			if(!newpours.front().equals(is)){
+		if (!array[current->a][current->b]) {
+			array[current->a][current->b] = true;
+			queue<State*> newpours = pour(current);
+			while (!newpours.empty()) {
 				Q.push(newpours.front());
-							cout << newpours.front().to_string() << endl;
-							cout
-									<< "Parent of previous: "
-											+ newpours.front().parent->to_string() << endl;
+				newpours.pop();
 			}
-			newpours.pop();
 		}
 	}
-	return "";
+	return "No solution.";
 }
 
 int main(int argc, char *const argv[]) {
