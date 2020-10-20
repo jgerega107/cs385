@@ -62,6 +62,9 @@ queue<State*> pour(State *p1) {
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
+		else{
+			delete newjug;
+		}
 	}
 	//b to a
 	if (p1->a != values[0]) {
@@ -86,6 +89,9 @@ queue<State*> pour(State *p1) {
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
+		else{
+			delete newjug;
+		}
 	}
 	//c to b
 	if (p1->b != values[1]) {
@@ -108,6 +114,9 @@ queue<State*> pour(State *p1) {
 		}
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
+		}
+		else{
+			delete newjug;
 		}
 	}
 	//a to b
@@ -133,6 +142,9 @@ queue<State*> pour(State *p1) {
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
+		else{
+			delete newjug;
+		}
 	}
 	//b to c
 	if (p1->c != values[2]) {
@@ -156,6 +168,9 @@ queue<State*> pour(State *p1) {
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
+		else{
+			delete newjug;
+		}
 	}
 	//a to c
 	if (p1->c != values[2]) {
@@ -178,6 +193,9 @@ queue<State*> pour(State *p1) {
 		}
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
+		}
+		else{
+			delete newjug;
 		}
 	}
 	return newstates;
@@ -204,8 +222,9 @@ string bfs(int a, int b, int c) {
 			while (current->parent != nullptr) {
 				string cpath = current->directions + " " + current->to_string();
 				path.push_back(cpath);
+				State* parent = current->parent;
 				delete current;
-				current = current->parent;
+				current = parent;
 			}
 			string ipath = is->directions + " " + is->to_string();
 			path.push_back(ipath);
@@ -240,7 +259,6 @@ string bfs(int a, int b, int c) {
 		else{
 			delete current;
 		}
-
 	}
 	return "No solution.";
 }
