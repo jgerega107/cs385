@@ -176,7 +176,6 @@ queue<State*> pour(State *p1) {
 			newjug->directions = "Pour " + to_string(amount)
 					+ " gallons from A to C.";
 		}
-
 		if (!newjug->equals(p1)) {
 			newstates.push(newjug);
 		}
@@ -205,6 +204,7 @@ string bfs(int a, int b, int c) {
 			while (current->parent != nullptr) {
 				string cpath = current->directions + " " + current->to_string();
 				path.push_back(cpath);
+				delete current;
 				current = current->parent;
 			}
 			string ipath = is->directions + " " + is->to_string();
@@ -215,6 +215,7 @@ string bfs(int a, int b, int c) {
 				++it;
 			}
 			solution += *it;
+			//cleanup
 			delete is;
 			delete gs;
 			for (int i = 0; i < rows; ++i) {
@@ -236,6 +237,10 @@ string bfs(int a, int b, int c) {
 				newpours.pop();
 			}
 		}
+		else{
+			delete current;
+		}
+
 	}
 	return "No solution.";
 }
