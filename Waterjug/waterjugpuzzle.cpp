@@ -204,6 +204,7 @@ string bfs(int a, int b, int c) {
 	queue<State*> Q;
 	State *is = new State(a, b, c, "Initial state.");
 	State *gs = new State(values[3], values[4], values[5], "Goal state.");
+	vector<State*> allvisitedstates;
 	int rows = values[0] + 1;
 	int cols = values[1] + 1;
 	bool **array = new bool*[rows];
@@ -212,6 +213,7 @@ string bfs(int a, int b, int c) {
 		fill(array[i], array[i] + cols, false);
 	}
 	Q.push(is);
+	allvisitedstates.push_back(is);
 	while (!Q.empty()) {
 		State *current = Q.front();
 		Q.pop();
@@ -222,7 +224,6 @@ string bfs(int a, int b, int c) {
 				string cpath = current->directions + " " + current->to_string();
 				path.push_back(cpath);
 				State* parent = current->parent;
-				delete current;
 				current = parent;
 			}
 			string ipath = is->directions + " " + is->to_string();
@@ -234,15 +235,16 @@ string bfs(int a, int b, int c) {
 			}
 			solution += *it;
 			//cleanup
-			delete is;
 			delete gs;
 			for (int i = 0; i < rows; ++i) {
 				delete[] array[i];
 			}
 			delete[] array;
 			while(!Q.empty()){
-				delete Q.front();
 				Q.pop();
+			}
+			for(auto it = allvisitedstates.cbegin(); it != allvisitedstates.cend(); ++it){
+				delete *it;
 			}
 			return solution;
 		}
@@ -256,21 +258,29 @@ string bfs(int a, int b, int c) {
 			else{
 				while (!newpours.empty()) {
 				Q.push(newpours.front());
+				allvisitedstates.push_back(newpours.front());
 				newpours.pop();
+				}
 			}
-			}
-		}
-		else{
-			delete current;
 		}
 	}
+	//cleanup
+	delete gs;
+	for (int i = 0; i < rows; ++i) {
+		delete[] array[i];
+	}
+	delete[] array;
+	while(!Q.empty()){
+		delete Q.front();
+		Q.pop();
+	}
+	for(auto it = allvisitedstates.cbegin(); it != allvisitedstates.cend(); ++it){
+				delete *it;
+			}
 	return "No solution.";
 }
 
 int main(int argc, char *const argv[]) {
-	// TODO: reads and parses command line arguments.
-	// Calls other functions to produce correct output.
-
 	if (argc != 7) {
 		cerr << "Usage: " << argv[0] << " <cap A> <cap B> <cap C> "
 				"<goal A> <goal B> <goal C>" << endl;
