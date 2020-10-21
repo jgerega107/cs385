@@ -36,7 +36,6 @@ struct State {
 
 };
 
-//jug == 0 for a, 1 for b, 2 for c
 queue<State*> pour(State *p1) {
 	queue<State*> newstates;
 	//c to a
@@ -242,8 +241,9 @@ string bfs(int a, int b, int c) {
 			}
 			delete[] array;
 			while(!Q.empty()){
-				delete Q.front();
+				current = Q.front();
 				Q.pop();
+				delete current;
 			}
 			return solution;
 		}
