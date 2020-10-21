@@ -241,9 +241,8 @@ string bfs(int a, int b, int c) {
 			}
 			delete[] array;
 			while(!Q.empty()){
-				current = Q.front();
+				delete Q.front();
 				Q.pop();
-				delete current;
 			}
 			return solution;
 		}
@@ -251,9 +250,14 @@ string bfs(int a, int b, int c) {
 		if (!array[current->a][current->b]) {
 			array[current->a][current->b] = true;
 			queue<State*> newpours = pour(current);
-			while (!newpours.empty()) {
+			if(newpours.empty()){
+				delete current;
+			}
+			else{
+				while (!newpours.empty()) {
 				Q.push(newpours.front());
 				newpours.pop();
+			}
 			}
 		}
 		else{
