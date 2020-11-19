@@ -211,16 +211,14 @@ public:
         const K& key = key_value.first;
         Node<K, V> *x, *y;
         Node<K, V> *z = new Node<K, V>(key, key_value.second);
-        Node<K, V> *nil = new Node<K, V>();
-        nil->color = BLACK;
         if (it != end()) {
             x = it.node_ptr;
             y = x->parent;
         } else {
             x = root_;
-            y = nil;
+            y = nullptr;
         }
-        while(x != nil && x != nullptr){
+        while(x != nullptr){
         	y=x;
         	if(key < y->key()){
         		x = x->left;
@@ -230,7 +228,7 @@ public:
         	}
         }
         z->parent = y;
-        if(y == nil){
+        if(y == nullptr){
         	root_ = z;
         }
         else if(key < y->key()){
@@ -239,8 +237,8 @@ public:
         else{
         	y->right = z;
         }
-        z->left = nil;
-        z->right = nil;
+        z->left = nullptr;
+        z->right = nullptr;
         z->color = 0;
         insert_fixup(z);
     }
@@ -395,10 +393,10 @@ private:
      */
     void insert_fixup(Node<K, V> *z) {
         Node<K, V> *y;
-        while(z->parent->color == 0){
+        while(z->parent != nullptr && z->parent->color == 0){
             if(z->parent == z->parent->parent->left){
                 y = z->parent->parent->right;
-                if(y->color == 0){
+                if(y != nullptr && y->color == 0){
                     z->parent->color = 1;
                     y->color = 1;
                     z->parent->parent->color = 0;
@@ -408,13 +406,15 @@ private:
                     z = z->parent;
                    left_rotate(z);
                 }
-                z->parent->color = 1;
-                z->parent->parent->color = 0;
-                right_rotate(z->parent->parent);
+                else{
+                    z->parent->color = 1;
+                    z->parent->parent->color = 0;
+                    right_rotate(z->parent->parent);
+                }
             }
             else{
                 y = z->parent->parent->right;
-                if(y->color == 0){
+                if(y != nullptr && y->color == 0){
                     z->parent->color = 1;
                     y->color = 1;
                     z->parent->parent->color = 0;
@@ -424,9 +424,11 @@ private:
                     z = z->parent;
                     right_rotate(z);
                 }
-                z->parent->color = 1;
-                z->parent->parent->color = 0;
-                left_rotate(z->parent->parent);
+                else{
+                    z->parent->color = 1;
+                    z->parent->parent->color = 0;
+                    left_rotate(z->parent->parent);
+                }
             }
         }
         // Last line below
@@ -445,7 +447,7 @@ private:
         }
         y->parent = x->parent;
         if(x->parent == nullptr){
-            root_ = x;
+            root_ = y;
         }
         else if(x == x->parent->left){
             x->parent->left = y;
@@ -469,7 +471,7 @@ private:
         }
         y->parent = x->parent;
         if(x->parent == nullptr){
-            root_ = x;
+            root_ = y;
         }
         else if(x == x->parent->right){
             x->parent->right = y;
