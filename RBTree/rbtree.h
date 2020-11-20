@@ -209,6 +209,11 @@ public:
      */
     void insert(const iterator &it, const std::pair<K, V> &key_value) {
         const K& key = key_value.first;
+        if(find(key) != end()){
+            std::cout << "Warning: " << key << " already in tree" << std::endl;
+        }
+        else{
+        size_++;
         Node<K, V> *x, *y;
         Node<K, V> *z = new Node<K, V>(key, key_value.second);
         if (it != end()) {
@@ -241,6 +246,7 @@ public:
         z->right = nullptr;
         z->color = 0;
         insert_fixup(z);
+        }
     }
 
     /**
@@ -413,14 +419,14 @@ private:
                 }
             }
             else{
-                y = z->parent->parent->right;
+                y = z->parent->parent->left;
                 if(y != nullptr && y->color == 0){
                     z->parent->color = 1;
                     y->color = 1;
                     z->parent->parent->color = 0;
                     z = z->parent->parent;
                 }
-                else if(z == z->parent->right){
+                else if(z == z->parent->left){
                     z = z->parent;
                     right_rotate(z);
                 }
@@ -518,17 +524,11 @@ private:
      * An internal node has at least one child.
      */
     size_t internal_node_count(Node<K, V> *node) const {
-        if(node == nullptr){
-            return 0;
-        }
-        else if((node->left == nullptr) != (node->right == nullptr)){
-            return 1;
-        }
-        else if(node->left == nullptr && node->right == nullptr){
+        if(node == nullptr || (node->left == nullptr && node->right == nullptr)){
             return 0;
         }
         else{
-            return internal_node_count(node->left) + internal_node_count(node->right);
+            return 1 + internal_node_count(node->left) + internal_node_count(node->right);
         }
     }
 
@@ -540,7 +540,7 @@ private:
             return 0;
         }
         else{
-            return 1+std::max(diameter(node->left), diameter(node->right));
+            return std::max(std::max(diameter(node->left), diameter(node->right)), 3+height(node->left)+height(node->right));
         }
     }
 
@@ -592,7 +592,7 @@ private:
      * has sum 0 + 2(1) + 2 = 4.
      */
     size_t sum_levels(Node<K, V> *node, size_t level) const {
-        if(node == nullptr){
+        if(level == 0){
             return 0;
         }
         else{
@@ -618,7 +618,7 @@ private:
      * has sum 3(2) + 2(3) = 12.
      */
     size_t sum_null_levels(Node<K, V> *node, size_t level) const {
-        if(node == nullptr){
+        if(level == 0){
             return 0;
         }
         else{
