@@ -210,7 +210,7 @@ public:
     void insert(const iterator &it, const std::pair<K, V> &key_value) {
         const K& key = key_value.first;
         if(find(key) != end()){
-            std::cout << "Warning: " << key << " already in tree" << std::endl;
+            std::cout << "Warning: Attempt to insert duplicate key '" << key << "'." << std::endl;
         }
         else{
         size_++;
@@ -390,7 +390,11 @@ private:
         if(n != nullptr){
             delete_tree(n->left);
             delete_tree(n->right);
-            n = nullptr;
+            n->parent = nullptr;
+            n->left = nullptr;
+            n->right = nullptr;
+            delete n->left;
+            delete n->right;
             delete n;
         }
     }
@@ -592,11 +596,11 @@ private:
      * has sum 0 + 2(1) + 2 = 4.
      */
     size_t sum_levels(Node<K, V> *node, size_t level) const {
-        if(level == 0){
+        if(node == nullptr){
             return 0;
         }
         else{
-            return (level * width(node, level)) + sum_levels(node->left, level - 1) + sum_levels(node->right, level - 1);
+            return level + sum_levels(node->left, level + 1) + sum_levels(node->right, level + 1);
         }
     }
 
@@ -618,11 +622,11 @@ private:
      * has sum 3(2) + 2(3) = 12.
      */
     size_t sum_null_levels(Node<K, V> *node, size_t level) const {
-        if(level == 0){
-            return 0;
+        if(node == nullptr){
+            return level;
         }
         else{
-            return ((null_count(node->left) + null_count(node->right)) * level) + sum_null_levels(node->left, level-1) + sum_null_levels(node->right, level-1);
+            return sum_null_levels(node->left, level + 1) + sum_null_levels(node->right, level + 1);
         }
     }
 };
