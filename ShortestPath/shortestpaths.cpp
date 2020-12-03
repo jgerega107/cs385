@@ -25,7 +25,11 @@ int main(int argc, const char *argv[]) {
     int vertices = 0;
     int ascii = 65;
     int maxascii = 64;
-    long **matrix;
+
+    long **matrix1;
+    long **matrix2;
+    char **ivertices;
+
     try {
         unsigned int line_number = 1;
         // Use getline to read in a line.
@@ -39,11 +43,17 @@ int main(int argc, const char *argv[]) {
                     cerr << "Error: Invalid number of vertices '" << line << "' on line " << line_number << ".";
                     return 1;
                 }
-                matrix = new long*[vertices];
+                matrix1 = new long*[vertices];
+                matrix2 = new long*[vertices];
+                ivertices = new char*[vertices];
                 for(int i = 0; i < vertices; i++){
-                    matrix[i] = new long[vertices];
+                    matrix1[i] = new long[vertices];
+                    matrix2[i] = new long[vertices];
+                    ivertices[i] = new char[vertices];
                     for(int k = 0; k < vertices; k++){
-                        matrix[i][k] = 0;
+                        matrix1[i][k] = 0;
+                        matrix2[i][k] = 0;
+                        ivertices[i][k] = '-';
                     }
                 }
             }
@@ -77,7 +87,7 @@ int main(int argc, const char *argv[]) {
                             cerr << "Error: Invalid edge weight '" << arg << "' on line " << line_number << ".";
                             return 1;
                         }
-                        matrix[row][col] = arg3;
+                        matrix1[row][col] = arg3;
                     }
                     arr.push_back(arg);
                     counter++;
@@ -89,13 +99,16 @@ int main(int argc, const char *argv[]) {
             }
             ++line_number;
 
+            //fill diagonal with 0's and any unreachable with infinitys (represented with max long)
             for(int i = 0; i < vertices; i++){
                 for(int k = 0; k < vertices; k++){
                     if(i == k){
-                        matrix[i][k] = 0;
+                        matrix1[i][k] = 0;
+                        matrix2[i][k] = 0;
                     }
-                    else if(matrix[i][k] == 0){
-                        matrix[i][k] = LONG_MAX;
+                    else if(matrix1[i][k] == 0){
+                        matrix1[i][k] = INT_MAX;
+                        matrix2[i][k] = INT_MAX;
                     }
                 }
             }
@@ -103,62 +116,90 @@ int main(int argc, const char *argv[]) {
         // Don't forget to close the file.
         input_file.close();
 
-        long **dmatrix = new long*[vertices];
+        cout << "Distance matrix initial: " << endl;
         for(int i = 0; i < vertices; i++){
-                dmatrix[i] = new long[vertices];
+            for(int k = 0; k < vertices; k++){
+                if(matrix1[i][k] == INT_MAX){
+                    cout << "-  ";
+                }
+                else{
+                    cout << matrix1[i][k] << "  ";
+                }
+            }
+            cout << endl;
+        }
+
+        for(int k = 0; k < vertices; k++){
+            for(int i = 0; i < vertices; i++){
+                for(int j = 0; j < vertices; j++){
+                    matrix2[i][j] = min(matrix1[i][j], matrix1[i][k] + matrix1[k][j]);
+                    if(matrix2[i][j] != matrix1[i][j]){
+                        ivertices[i][j] = char(65+k);
+                    }
+                }
+            }
+            //copy m2 back to m1
+            for(int i = 0; i < vertices; i++){
+                for(int j = 0; j < vertices; j++){
+                    matrix1[i][j] = matrix2[i][j];
+                }
+            }
+            cout << "Distance matrix new:" << endl;
+            for(int i = 0; i < vertices; i++){
                 for(int k = 0; k < vertices; k++){
-                    dmatrix[i][k] = 0;
+                    if(matrix1[i][k] == INT_MAX){
+                        cout << "-  ";
+                    }
+                    else{
+                        cout << matrix1[i][k] << "  ";
+                    }
+                }
+                cout << endl;
+            }
+        }
+
+        cout << "Intermediate vertices matrix initial: " << endl;
+        for(int i = 0; i < vertices; i++){
+            for(int k = 0; k < vertices; k++){
+                if(ivertices[i][k] == '-'){
+                    cout << "-  ";
+                }
+                else{
+                    cout << ivertices[i][k] << "  ";
                 }
             }
+            cout << endl;
+        }
+
+        cout << "Paths" << endl;
+        for(int i = 0; i < vertices; i++){
+            for(int k = 0; k < vertices; k++){
+                if(matrix2[i][k] != INT_MAX){
+                    cout << char(65+i) << " -> " << char(65+k) << ", distance: " << matrix2[i][k] << ", path: " << char(65+i);
+                    char current = char(65+i);
+                    while(current != '-' && matrix2[int(current) - 65][k] != INT_MAX && i != k){
+                        current = ivertices[int(current) - 65][k];
+                        if(current == '-'){
+                            cout << " -> " << char(65+k);
+                        }
+                        else{
+                            cout << " -> " << current;
+                        }
+                    }
+                    cout << endl;
+                }
+            }
+        }
         
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(i == k){
-                    dmatrix[i][k] = 0;
-                }
-                else if(i == 0 || k == 0){
-                    dmatrix[i][k] = matrix[i][k];
-                }
-            }
-        }
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(matrix[i][0] != LONG_MAX && matrix[0][k] != LONG_MAX && dmatrix[i][k] > matrix[i][0] + matrix[0][k]){
-                    dmatrix[i][k] = matrix[i][0] + matrix[0][k];
-                }
-            }
-        }
-        cout << "Initial Distance Matrix:" << endl;
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(matrix[i][k] == LONG_MAX){
-                    cout << "-  ";
-                }
-                else{
-                    cout << matrix[i][k] << "  ";
-                }
-            }
-            cout << endl;
-        }
-        cout << "Modified Distance Matrix:" << endl;
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(dmatrix[i][k] == LONG_MAX){
-                    cout << "-  ";
-                }
-                else{
-                    cout << dmatrix[i][k] << "  ";
-                }
-            }
-            cout << endl;
-        }
         for (int i = 0; i < vertices; ++i) {
-            delete [] matrix[i];
-            delete [] dmatrix[i];
+            delete [] matrix1[i];
+            delete [] matrix2[i];
+            delete [] ivertices[i];
         }           
         // Delete the array itself.
-        delete [] matrix;
-        delete [] dmatrix;
+        delete [] matrix1;
+        delete [] matrix2;
+        delete [] ivertices;
 
     } catch (const ifstream::failure &f) {
         cerr << "Error: An I/O error occurred reading '" << argv[1] << "'.";
