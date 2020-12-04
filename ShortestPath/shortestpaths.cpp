@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Name        : shortestpaths.cpp
+ * Author      : Jacob Gerega
+ * Version     : 1.0
+ * Date        : 12/04/20
+ * Description : Implementation of Floyd's Algorithm
+ * Pledge      : I pledge my honor that I have abided by the Stevens Honor System.
+ ******************************************************************************/
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,6 +15,12 @@
 
 using namespace std;
 
+long **matrix1;
+long **matrix2;
+char **ivertices;
+int vertices;
+
+//returns how many digits are in a long
 long len(long n){
     long counter = 0;
     while(n != 0){
@@ -16,6 +30,7 @@ long len(long n){
     return counter;
 }
 
+//returns the shortest path between two points
 string pathfinder(long** m1, char** ivm, int from, int to){
     if(m1[from][to] == UINT_MAX){
         return "none";
@@ -34,6 +49,7 @@ string pathfinder(long** m1, char** ivm, int from, int to){
     }
 }
 
+//outputs a matrix of vertice weights, given bounds as vertices
 void displaymatrix(long** matrix, int vertices){
     long max = 0;
     for(int i = 0; i < vertices; i++){
@@ -69,6 +85,7 @@ void displaymatrix(long** matrix, int vertices){
         cout << endl;
 }
 
+//outputs a matrix of vertices, given bounds as vertices
 void displaymatrix(char** matrix, int vertices){
         for(int i = 0; i < vertices+1; i++){
             for(int k = 0; k < vertices+1; k++){
@@ -93,6 +110,18 @@ void displaymatrix(char** matrix, int vertices){
         cout << endl;
 }
 
+//cleans up all heap usage with arrays
+void cleanup(){
+    for (int i = 0; i < vertices; ++i) {
+            delete [] matrix1[i];
+            delete [] matrix2[i];
+            delete [] ivertices[i];
+        }           
+        // Delete the array itself.
+        delete [] matrix1;
+        delete [] matrix2;
+        delete [] ivertices;
+}
 int main(int argc, const char *argv[]) {
     // Make sure the right number of command line arguments exist.
     if (argc != 2) {
@@ -109,12 +138,9 @@ int main(int argc, const char *argv[]) {
     // Add read errors to the list of exceptions the ifstream will handle.
     input_file.exceptions(ifstream::badbit);
     string line;
-    int vertices = 0;
+    vertices = 0;
     int ascii = 65;
     int maxascii = 64;
-    long **matrix1;
-    long **matrix2;
-    char **ivertices;
 
     try {
         unsigned int line_number = 1;
@@ -154,6 +180,7 @@ int main(int argc, const char *argv[]) {
                     if(counter == 0){
                         if(int(arg[0]) > maxascii || int(arg[0]) < ascii){
                             cerr << "Error: Starting vertex '" << arg << "' on line " << line_number << " is not among valid values " << char(ascii) << "-" << char(maxascii) << ".";
+                            cleanup();
                             return 1;
                         }
                         row = (int(arg[0]) - 65);
@@ -161,6 +188,7 @@ int main(int argc, const char *argv[]) {
                     else if(counter == 1){
                         if(int(arg[0]) > maxascii || int(arg[0]) < ascii){
                             cerr << "Error: Ending vertex '" << arg << "' on line " << line_number << " is not among valid values " << char(ascii) << "-" << char(maxascii) << ".";
+                            cleanup();
                             return 1;
                         }
                         col = (int(arg[0]) - 65);
@@ -171,6 +199,7 @@ int main(int argc, const char *argv[]) {
                         weight >> arg3;
                         if(arg3 <= 0){
                             cerr << "Error: Invalid edge weight '" << arg << "' on line " << line_number << ".";
+                            cleanup();
                             return 1;
                         }
                         matrix1[row][col] = arg3;
@@ -180,12 +209,13 @@ int main(int argc, const char *argv[]) {
                 }
                 if(arr.size() != 3){
                     cerr << "Error: Invalid edge data '" << line << "' on line " << line_number << ".";
+                    cleanup();
                     return 1;
                 }
             }
             ++line_number;
 
-            //fill diagonal with 0's and any unreachable with infinitys (represented with max long)
+            //fill diagonal with 0's and any unreachable with infinitys (represented with max uint)
             for(int i = 0; i < vertices; i++){
                 for(int k = 0; k < vertices; k++){
                     if(i == k){
@@ -246,16 +276,8 @@ int main(int argc, const char *argv[]) {
             }
             
         }
-        
-        for (int i = 0; i < vertices; ++i) {
-            delete [] matrix1[i];
-            delete [] matrix2[i];
-            delete [] ivertices[i];
-        }           
-        // Delete the array itself.
-        delete [] matrix1;
-        delete [] matrix2;
-        delete [] ivertices;
+
+        cleanup();
 
     } catch (const ifstream::failure &f) {
         cerr << "Error: An I/O error occurred reading '" << argv[1] << "'.";
