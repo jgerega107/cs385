@@ -3,8 +3,95 @@
 #include <sstream>
 #include <vector>
 #include <climits>
+#include <iomanip>
 
 using namespace std;
+
+long len(long n){
+    long counter = 0;
+    while(n != 0){
+        n /= 10;
+        counter++;
+    }
+    return counter;
+}
+
+string pathfinder(long** m1, char** ivm, int from, int to){
+    if(m1[from][to] == UINT_MAX){
+        return "none";
+    }
+    else if(ivm[from][to] == '-'){
+        string s;
+        s.push_back(char(to+65));
+        return s;
+    }
+    else{
+        string s;
+        s.append(pathfinder(m1, ivm, from, int(ivm[from][to])-65));
+        s.append(" -> ");
+        s.append(pathfinder(m1, ivm, int(ivm[from][to])-65, to));
+        return s;
+    }
+}
+
+void displaymatrix(long** matrix, int vertices){
+    long max = 0;
+    for(int i = 0; i < vertices; i++){
+        for(int k = 0; k < vertices; k++){
+            if(max < matrix[i][k] && matrix[i][k] != UINT_MAX)
+            max = matrix[i][k];
+        }
+    }
+    long maxw = len(max);
+        for(int i = 0; i < vertices+1; i++){
+            for(int k = 0; k < vertices+1; k++){
+                if(i == 0 && k == 0){
+                    cout << " ";
+                }
+                else if(i == 0 && k != 0){
+                    cout << " " << setw(maxw);
+                    cout << char(64+k);
+                }
+                else if(k == 0 && i != 0){
+                    cout << char(64+i);
+                }
+                else if(matrix[i-1][k-1] == UINT_MAX){
+                    cout << " " << setw(maxw);
+                    cout << "-";
+                }
+                else{
+                    cout << " " << setw(maxw);
+                    cout << matrix[i-1][k-1];
+                }
+            }
+            cout << endl;
+        }
+        cout << endl;
+}
+
+void displaymatrix(char** matrix, int vertices){
+        for(int i = 0; i < vertices+1; i++){
+            for(int k = 0; k < vertices+1; k++){
+                if(i == 0 && k != 0){
+                    cout << " " << char(64+k);
+                }
+                else if(k == 0 && i != 0){
+                    cout << char(64+i);
+                }
+                else if(k == 0 && i == 0){
+                    cout <<  " ";
+                }
+                else if(matrix[i-1][k-1] == '-'){
+                    cout << " -";
+                }
+                else{
+                    cout << " " << matrix[i-1][k-1];
+                }
+            }
+            cout << endl;
+        }
+        cout << endl;
+}
 
 int main(int argc, const char *argv[]) {
     // Make sure the right number of command line arguments exist.
@@ -25,7 +112,6 @@ int main(int argc, const char *argv[]) {
     int vertices = 0;
     int ascii = 65;
     int maxascii = 64;
-
     long **matrix1;
     long **matrix2;
     char **ivertices;
@@ -51,9 +137,9 @@ int main(int argc, const char *argv[]) {
                     matrix2[i] = new long[vertices];
                     ivertices[i] = new char[vertices];
                     for(int k = 0; k < vertices; k++){
-                        matrix1[i][k] = 0;
-                        matrix2[i][k] = 0;
-                        ivertices[i][k] = '-';
+                        fill(matrix1[i], matrix1[i] + vertices, 0);
+                        fill(matrix2[i], matrix2[i] + vertices, 0);
+                        fill(ivertices[i], ivertices[i] + vertices, '-');
                     }
                 }
             }
@@ -67,14 +153,14 @@ int main(int argc, const char *argv[]) {
                 while(data >> arg){
                     if(counter == 0){
                         if(int(arg[0]) > maxascii || int(arg[0]) < ascii){
-                            cerr << "Error: Starting vertex '" << arg << "' on line " << line_number << " is not amoung valid values " << char(ascii) << "-" << char(maxascii) << ".";
+                            cerr << "Error: Starting vertex '" << arg << "' on line " << line_number << " is not among valid values " << char(ascii) << "-" << char(maxascii) << ".";
                             return 1;
                         }
                         row = (int(arg[0]) - 65);
                     }
                     else if(counter == 1){
                         if(int(arg[0]) > maxascii || int(arg[0]) < ascii){
-                            cerr << "Error: Ending vertex '" << arg << "' on line " << line_number << " is not amoung valid values " << char(ascii) << "-" << char(maxascii) << ".";
+                            cerr << "Error: Ending vertex '" << arg << "' on line " << line_number << " is not among valid values " << char(ascii) << "-" << char(maxascii) << ".";
                             return 1;
                         }
                         col = (int(arg[0]) - 65);
@@ -83,7 +169,7 @@ int main(int argc, const char *argv[]) {
                         stringstream weight(arg);
                         int arg3;
                         weight >> arg3;
-                        if(arg3 < 0){
+                        if(arg3 <= 0){
                             cerr << "Error: Invalid edge weight '" << arg << "' on line " << line_number << ".";
                             return 1;
                         }
@@ -107,8 +193,8 @@ int main(int argc, const char *argv[]) {
                         matrix2[i][k] = 0;
                     }
                     else if(matrix1[i][k] == 0){
-                        matrix1[i][k] = INT_MAX;
-                        matrix2[i][k] = INT_MAX;
+                        matrix1[i][k] = UINT_MAX;
+                        matrix2[i][k] = UINT_MAX;
                     }
                 }
             }
@@ -116,18 +202,8 @@ int main(int argc, const char *argv[]) {
         // Don't forget to close the file.
         input_file.close();
 
-        cout << "Distance matrix initial: " << endl;
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(matrix1[i][k] == INT_MAX){
-                    cout << "-  ";
-                }
-                else{
-                    cout << matrix1[i][k] << "  ";
-                }
-            }
-            cout << endl;
-        }
+        cout << "Distance matrix:" << endl;
+        displaymatrix(matrix1, vertices);
 
         for(int k = 0; k < vertices; k++){
             for(int i = 0; i < vertices; i++){
@@ -144,51 +220,31 @@ int main(int argc, const char *argv[]) {
                     matrix1[i][j] = matrix2[i][j];
                 }
             }
-            cout << "Distance matrix new:" << endl;
-            for(int i = 0; i < vertices; i++){
-                for(int k = 0; k < vertices; k++){
-                    if(matrix1[i][k] == INT_MAX){
-                        cout << "-  ";
-                    }
-                    else{
-                        cout << matrix1[i][k] << "  ";
-                    }
+        }
+        cout << "Path lengths:" << endl;
+        displaymatrix(matrix2, vertices);
+        cout << "Intermediate vertices:" << endl;
+        displaymatrix(ivertices, vertices);
+
+
+        for(int i = 0; i < vertices; i++){
+            for(int k = 0; k < vertices; k++){
+                if(matrix2[i][k] == UINT_MAX){
+                    cout << char(65+i) << " -> " << char(65+k) << ", distance: infinity, path: none";
+                }
+                else if(i == k){
+                    cout << char(65+i) << " -> " << char(65+k) << ", distance: 0, path: " << char(65+i);
+                }
+                else{
+                    string s;
+                    s.push_back(char(65+i));
+                    s.append(" -> ");
+                    s.append(pathfinder(matrix2, ivertices, i,k));
+                    cout << char(65+i) << " -> " << char(65+k) << ", distance: " << matrix2[i][k] << ", path: " << s;
                 }
                 cout << endl;
             }
-        }
-
-        cout << "Intermediate vertices matrix initial: " << endl;
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(ivertices[i][k] == '-'){
-                    cout << "-  ";
-                }
-                else{
-                    cout << ivertices[i][k] << "  ";
-                }
-            }
-            cout << endl;
-        }
-
-        cout << "Paths" << endl;
-        for(int i = 0; i < vertices; i++){
-            for(int k = 0; k < vertices; k++){
-                if(matrix2[i][k] != INT_MAX){
-                    cout << char(65+i) << " -> " << char(65+k) << ", distance: " << matrix2[i][k] << ", path: " << char(65+i);
-                    char current = char(65+i);
-                    while(current != '-' && matrix2[int(current) - 65][k] != INT_MAX && i != k){
-                        current = ivertices[int(current) - 65][k];
-                        if(current == '-'){
-                            cout << " -> " << char(65+k);
-                        }
-                        else{
-                            cout << " -> " << current;
-                        }
-                    }
-                    cout << endl;
-                }
-            }
+            
         }
         
         for (int i = 0; i < vertices; ++i) {
