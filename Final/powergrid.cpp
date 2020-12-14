@@ -12,6 +12,7 @@
 #include <vector>
 #include <climits>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 struct edge{
@@ -32,6 +33,10 @@ edge minedge(edge a, edge b){
 bool equaledge(edge a,edge b){
         return a.from == b.from && a.to == b.to && a.weight == b.weight && a.name == b.name;
     }
+
+bool sortnames(vector<edge> a, vector<edge> b){
+    return a.at(0).name > b.at(0).name;
+}
 
 int vertices;
 edge **adjmatrix;
@@ -185,8 +190,9 @@ int main(int argc, const char *argv[]) {
     for(auto it1 = adjlist.cend()-1; it1 != adjlist.cbegin(); --it1){
         sumlength += it1->at(0).weight;
     }
+    sort(adjlist.begin(), adjlist.end(), sortnames); //sort by name
     cout << "Total wire length (meters): " << sumlength << endl;
-    for(auto it1 = adjlist.cend()-1; it1 != adjlist.cbegin(); --it1){
+    for(auto it1 = adjlist.cend()-2; it1 != adjlist.cbegin()-1; --it1){
         cout << it1->at(0).name << " [" << it1->at(0).weight << "]" << endl;
     }
     cleanup();
