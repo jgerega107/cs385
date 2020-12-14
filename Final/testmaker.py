@@ -1,6 +1,6 @@
 import random
 
-count = 10
+count = 100
 print(str(count))
 wgs = []
 
@@ -9,7 +9,7 @@ while r <= count:
     c = 1
     while c <= count:
         if c != r:
-            wg = random.randint(1, 500)
+            wg = random.randint(1, count*count)
             while wg in wgs:
                 wg = random.randint(1, count*count)
             wgs.append(wg)
