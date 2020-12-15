@@ -18,7 +18,7 @@ using namespace std;
 struct edge{
     int from;
     int to;
-    int weight;
+    long weight;
     string name;
 };
 
@@ -84,7 +84,7 @@ int main(int argc, const char *argv[]) {
                         edge e;
                         e.from = i+1;
                         e.to = k+1;
-                        e.weight = INT_MAX;
+                        e.weight = LONG_MAX;
                         adjmatrix[i][k] = e;
                     }
                 }
@@ -104,9 +104,9 @@ int main(int argc, const char *argv[]) {
                 stringstream from(arr.at(0));
                 stringstream to(arr.at(1));
                 stringstream weight(arr.at(2));
-                int fromi;
-                int toi;
-                int weighti;
+                int fromi = 0;
+                int toi = 0;
+                long weighti = 0;
                 from >> fromi;
                 to >> toi;
                 weight >> weighti;
@@ -131,8 +131,13 @@ int main(int argc, const char *argv[]) {
                 e.to = toi;
                 e.weight = weighti;
                 e.name = arr.at(3);
+                edge ei;
+                ei.from = toi;
+                ei.to = fromi;
+                ei.weight = weighti;
+                ei.name = arr.at(3);
                 adjmatrix[fromi - 1][toi - 1] = e;
-                adjmatrix[toi - 1][fromi - 1] = e;
+                adjmatrix[toi - 1][fromi - 1] = ei;
             }
             ++line_number;
         }
@@ -147,7 +152,7 @@ int main(int argc, const char *argv[]) {
     for(int r = 0; r < vertices; r++){
         bool alone = true;
         for(int c = 0; c < vertices; c++){
-            if(adjmatrix[r][c].weight != INT_MAX){
+            if(adjmatrix[r][c].weight != LONG_MAX){
                 alone = false;
             }
         }
@@ -167,7 +172,7 @@ int main(int argc, const char *argv[]) {
     adjlist.push_back(trow);
     while(trow.size() > 1){
         //first find the shortest path
-        int minweight = INT_MAX;
+        long minweight = LONG_MAX;
         edge min;
         for(auto it = trow.cbegin() + 1; it != trow.cend(); ++it){
             if(it->weight < minweight){
@@ -182,6 +187,12 @@ int main(int argc, const char *argv[]) {
                 newrow.push_back(minedge(*it, adjmatrix[newrow.at(0).to-1][it->to-1]));
             }
         }
+        /*
+        for(auto it = trow.cbegin(); it != trow.cend(); ++it){
+            cout << it->to << "(" << it->from << "," << it->weight << "), ";
+        }
+        cout << endl;
+        */
         trow = newrow;
         adjlist.push_back(newrow);
     }
