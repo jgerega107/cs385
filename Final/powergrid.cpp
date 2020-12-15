@@ -197,7 +197,7 @@ int main(int argc, const char *argv[]) {
         adjlist.push_back(newrow);
     }
 
-    int sumlength = 0;
+    long sumlength = 0;
     for(auto it1 = adjlist.cend()-1; it1 != adjlist.cbegin(); --it1){
         sumlength += it1->at(0).weight;
     }
