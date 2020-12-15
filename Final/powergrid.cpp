@@ -15,24 +15,24 @@
 #include <algorithm>
 
 using namespace std;
-struct edge{
+class edge{
+    public:
     int from;
     int to;
     long weight;
     string name;
-};
-
-edge minedge(edge a, edge b){
-        if(a.weight < b.weight){
-            return a;
+    edge minedge(edge b) const{
+        if(weight < b.weight){
+            return *this;
         }
         else{
             return b;
         }
     }
-bool equaledge(edge a,edge b){
-        return a.from == b.from && a.to == b.to && a.weight == b.weight && a.name == b.name;
+    bool equaledge(edge b) const{
+        return from == b.from && to == b.to && weight == b.weight && name == b.name;
     }
+};
 
 bool sortnames(vector<edge> a, vector<edge> b){
     return a.at(0).name > b.at(0).name;
@@ -183,8 +183,8 @@ int main(int argc, const char *argv[]) {
         vector<edge> newrow;
         newrow.push_back(min);
         for(auto it = trow.cbegin() + 1; it != trow.cend(); ++it){
-            if(!equaledge(*it, newrow.at(0))){
-                newrow.push_back(minedge(*it, adjmatrix[newrow.at(0).to-1][it->to-1]));
+            if(!(it->equaledge(newrow.at(0)))){
+                newrow.push_back(it->minedge(adjmatrix[newrow.at(0).to-1][it->to-1]));
             }
         }
         /*
