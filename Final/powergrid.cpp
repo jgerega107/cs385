@@ -179,6 +179,11 @@ int main(int argc, const char *argv[]) {
                 minweight = it->weight;
                 min = *it;
             }
+        }//to check for disconnected graphs
+        if(minweight == LONG_MAX){
+            cout << "No solution." << endl;
+            cleanup();
+            return 1;
         }
         vector<edge> newrow;
         newrow.push_back(min);
